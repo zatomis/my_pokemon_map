@@ -12,6 +12,6 @@ class PokemonEntity(models.Model):
 class Pokemon(models.Model):
     title = models.TextField()
     photo = models.ImageField(blank=True)
-
+    coordinats = models.ForeignKey(PokemonEntity, on_delete=models.CASCADE)
     def __str__(self):
         return f'{self.title}'
