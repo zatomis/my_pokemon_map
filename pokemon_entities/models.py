@@ -23,5 +23,5 @@ class Pokemon(models.Model):
     defense = models.IntegerField(help_text="защита", default=random.randint(5,10))
     stamina = models.IntegerField(help_text="выносливость", default=random.randint(5,10))
 
-def __str__(self):
+    def __str__(self):
         return f'{self.title}'
