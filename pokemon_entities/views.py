@@ -53,8 +53,8 @@ def show_pokemon(request, pokemon_id):
         current_pokemon = Pokemon.objects.get(id=int(pokemon_id))
         requested_pokemon = {   'pokemon_id': current_pokemon.id,
                                 'title_ru': f"{current_pokemon.title}",
-                                'title_en': '',
-                                'title_jp': '',
+                                'title_en': f"{current_pokemon.title_en}",
+                                'title_jp': f"{current_pokemon.title_jp}",
                                 'description': f"{current_pokemon.description}",
                                 'img_url': f"{request.build_absolute_uri('/')[:-1]}/media/{current_pokemon.photo}",
                                # 'img_url': f"{current_pokemon.photo}",

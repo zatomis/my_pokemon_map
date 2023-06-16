@@ -13,6 +13,8 @@ class PokemonEntity(models.Model):
 
 class Pokemon(models.Model):
     title = models.TextField()
+    title_en = models.TextField(default="EN")
+    title_jp = models.TextField(default="JP")
     photo = models.ImageField(blank=True)
     coordinats = models.ForeignKey(PokemonEntity, on_delete=models.CASCADE)
     description = models.TextField(default="Покемон")
