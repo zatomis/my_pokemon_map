@@ -15,6 +15,7 @@ class Pokemon(models.Model):
     title = models.TextField()
     photo = models.ImageField(blank=True)
     coordinats = models.ForeignKey(PokemonEntity, on_delete=models.CASCADE)
+    description = models.TextField(default="Покемон")
     appeared_at = models.DateTimeField(help_text="появится",default=datetime.now())
     disappeared_at = models.DateTimeField(help_text="пропадет",default=datetime.now())
     level = models.IntegerField(help_text="уровень", default=random.randint(5,10))
