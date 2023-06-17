@@ -10,12 +10,23 @@ class PokemonEntity(models.Model):
     def __str__(self):
         return f'координаты {self.lon} {self.lat}'
 
+class PokemonGeneration(models.Model):
+    pokemon_id = models.IntegerField(default=0, blank=True)
+    title_pg = models.TextField(blank=True, default="Покемон")
+    photo_pg = models.ImageField(blank=True, default="")
+
+    def __str__(self):
+        return f' {self.title} {self.photo}'
+
 
 class Pokemon(models.Model):
     title = models.TextField()
     title_en = models.TextField(default="EN")
     title_jp = models.TextField(default="JP")
     photo = models.ImageField(blank=True)
+    # next_evolution = models.ForeignKey(PokemonGeneration, on_delete=models.CASCADE, related_name='next')
+    next_evolution = models.ForeignKey("self", on_delete=models.CASCADE, related_name='next', null=True, blank=True)
+    previous_evolution = models.ForeignKey("self", on_delete=models.CASCADE, related_name='previous', null=True, blank=True)
     coordinats = models.ForeignKey(PokemonEntity, on_delete=models.CASCADE)
     description = models.TextField(default="Покемон")
     appeared_at = models.DateTimeField(help_text="появится",default=datetime.now())

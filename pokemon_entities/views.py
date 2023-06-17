@@ -3,7 +3,7 @@ import json
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from .models import Pokemon
-from django.utils.timezone import localtime , now
+from django.utils.timezone import localtime, now
 
 MOSCOW_CENTER = [55.751244, 37.618423]
 DEFAULT_IMAGE_URL = (
@@ -30,8 +30,8 @@ def show_all_pokemons(request):
     time_now = localtime(now())
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_db in Pokemon.objects.all():
-        if (localtime(pokemon_db.appeared_at) <= time_now):
-            if (localtime(pokemon_db.disappeared_at) >= time_now):
+        if localtime(pokemon_db.appeared_at) <= time_now:
+            if localtime(pokemon_db.disappeared_at) >= time_now:
                 add_pokemon(folium_map, pokemon_db.coordinats.lat, pokemon_db.coordinats.lon, f"{request.build_absolute_uri()}/media/{pokemon_db.photo}")
 
     pokemons_on_page = []
@@ -57,14 +57,34 @@ def show_pokemon(request, pokemon_id):
                                 'title_jp': f"{current_pokemon.title_jp}",
                                 'description': f"{current_pokemon.description}",
                                 'img_url': f"{request.build_absolute_uri('/')[:-1]}/media/{current_pokemon.photo}",
-                               # 'img_url': f"{current_pokemon.photo}",
-                                'entities': [{'level': f"{current_pokemon.level}", 'lat': f"{current_pokemon.coordinats.lat}", 'lon': f"{current_pokemon.coordinats.lon}",}],
-                                'next_evolution': { 'title_ru': '',
+                                'entities': [{'level': f"{current_pokemon.level}", 'lat': f"{current_pokemon.coordinats.lat}", 'lon': f"{current_pokemon.coordinats.lon}",}],}
+        print("")
+        if current_pokemon.next_evolution is None:
+            requested_pokemon['next_evolution'] = { 'title_ru': "Нет потомка",
                                                     'pokemon_id': 0,
-                                                    'img_url': ''},
-                                'previous_evolution': { 'title_ru': '',
+                                                    'img_url': ''}
+            requested_pokemon['previous_evolution'] = { 'title_ru': f"{current_pokemon.previous_evolution.title}",
+                                                        'pokemon_id': current_pokemon.previous_evolution.id,
+                                                        'img_url': ''}
+
+        else:
+            requested_pokemon['next_evolution'] = {'title_ru': f"{current_pokemon.next_evolution.title}",
+                                                   'pokemon_id': current_pokemon.next_evolution.id,
+                                                   'img_url': ''}
+
+        if current_pokemon.previous_evolution is None:
+            requested_pokemon['previous_evolution'] = { 'title_ru': "Нет предка",
                                                         'pokemon_id': 0,
-                                                        'img_url': ''}}
+                                                        'img_url': ''}
+            requested_pokemon['next_evolution'] = {'title_ru': f"{current_pokemon.next_evolution.title}",
+                                                   'pokemon_id': current_pokemon.next_evolution.id,
+                                                   'img_url': ''}
+
+        else:
+            requested_pokemon['previous_evolution'] = { 'title_ru': f"{current_pokemon.previous_evolution.title}",
+                                                        'pokemon_id': current_pokemon.previous_evolution.id,
+                                                        'img_url': ''}
+
     except Pokemon.DoesNotExist:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
