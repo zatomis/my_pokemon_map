@@ -4,38 +4,29 @@ import random
 
 
 class PokemonEntity(models.Model):
-    lon = models.FloatField(blank=False)
-    lat = models.FloatField(blank=False)
+    lon = models.FloatField(blank=False, verbose_name='долгота')
+    lat = models.FloatField(blank=False, verbose_name='широта')
 
     def __str__(self):
         return f'координаты {self.lon} {self.lat}'
 
-class PokemonGeneration(models.Model):
-    pokemon_id = models.IntegerField(default=0, blank=True)
-    title_pg = models.TextField(blank=True, default="Покемон")
-    photo_pg = models.ImageField(blank=True, default="")
-
-    def __str__(self):
-        return f' {self.title} {self.photo}'
-
 
 class Pokemon(models.Model):
-    title = models.TextField()
-    title_en = models.TextField(default="EN")
-    title_jp = models.TextField(default="JP")
-    photo = models.ImageField(blank=True)
-    # next_evolution = models.ForeignKey(PokemonGeneration, on_delete=models.CASCADE, related_name='next')
-    next_evolution = models.ForeignKey("self", on_delete=models.CASCADE, related_name='next', null=True, blank=True)
-    previous_evolution = models.ForeignKey("self", on_delete=models.CASCADE, related_name='previous', null=True, blank=True)
-    coordinats = models.ForeignKey(PokemonEntity, on_delete=models.CASCADE)
-    description = models.TextField(default="Покемон")
-    appeared_at = models.DateTimeField(help_text="появится",default=datetime.now())
-    disappeared_at = models.DateTimeField(help_text="пропадет",default=datetime.now())
-    level = models.IntegerField(help_text="уровень", default=random.randint(5,10))
-    health = models.IntegerField(help_text="здоровье", default=random.randint(5,10))
-    attack = models.IntegerField(help_text="атака", default=random.randint(5,10))
-    defense = models.IntegerField(help_text="защита", default=random.randint(5,10))
-    stamina = models.IntegerField(help_text="выносливость", default=random.randint(5,10))
+    title = models.TextField(verbose_name='наименование пакемона', blank=False)
+    title_en = models.TextField(verbose_name='наименование пакемона на английском')
+    title_jp = models.TextField(verbose_name='наименование пакемона на японском')
+    photo = models.ImageField(blank=True, verbose_name='изображение пакемона')
+    next_evolution = models.ForeignKey("self", on_delete=models.CASCADE, related_name='next', null=True, blank=True, verbose_name='потомок покемона')
+    previous_evolution = models.ForeignKey("self", on_delete=models.CASCADE, related_name='previous', null=True, blank=True, verbose_name='предок покемона')
+    coordinats = models.ForeignKey(PokemonEntity, on_delete=models.CASCADE, verbose_name='координаты на карте', blank=False)
+    description = models.TextField(default="Покемон", verbose_name='детальное описание покемона')
+    appeared_at = models.DateTimeField(help_text="появится", blank=False, verbose_name='время появления покемона',blank=False)
+    disappeared_at = models.DateTimeField(help_text="пропадет", blank=False, verbose_name='время исчезновения покемона',blank=False)
+    level = models.IntegerField(help_text="уровень", blank=False, verbose_name='уровень развития покемона')
+    health = models.IntegerField(help_text="здоровье", blank=False, verbose_name='уровень здоровья покемона')
+    attack = models.IntegerField(help_text="атака", blank=False, verbose_name='атака покемона')
+    defense = models.IntegerField(help_text="защита", blank=False, verbose_name='защита покемона')
+    stamina = models.IntegerField(help_text="выносливость", blank=False, verbose_name='выносливость покемона')
 
     def __str__(self):
-        return f'{self.title}'
+        return self.title
