@@ -51,50 +51,31 @@ def show_pokemon(request, pokemon_id):
     # try:
     current_pokemon = get_object_or_404(Pokemon, id=int(pokemon_id))
     requested_pokemon = {'pokemon_id': current_pokemon.id,
-                         'title': f"{current_pokemon.title}",
-                         'title_en': f"{current_pokemon.title_en}",
-                         'title_jp': f"{current_pokemon.title_jp}",
-                         'description': f"{current_pokemon.pokemon_entities.description}",
+                         'title': current_pokemon.title,
+                         'title_en': current_pokemon.title_en,
+                         'title_jp': current_pokemon.title_jp,
+                         'description': current_pokemon.pokemon_entities.description,
                          'img_url': f"{request.build_absolute_uri('/media/')}{current_pokemon.photo}",
-                         'entities': [{'level': f"{current_pokemon.pokemon_entities.level}", 'lat': f"{current_pokemon.pokemon_entities.lat}", 'lon': f"{current_pokemon.pokemon_entities.lon}",}],}
+                         'entities': [{'level': current_pokemon.pokemon_entities.level, 'lat': current_pokemon.pokemon_entities.lat, 'lon': current_pokemon.pokemon_entities.lon,}],}
 
-    requested_pokemon['next_evolution'] = { 'title_ru': "Нет потомка",
-                                            'pokemon_id': 0,
-                                            'img_url': ''}
-    requested_pokemon['previous_evolution'] = { 'title_ru': f"",
+    if current_pokemon.evolution is None:
+        requested_pokemon['previous_evolution'] = { 'title_ru': "Предок неизвестен",
                                                 'pokemon_id': 0,
                                                 'img_url': ''}
-    print(current_pokemon.pokemon_entities.pokemon)
+    else:
+        requested_pokemon['previous_evolution'] = { 'title_ru': current_pokemon.evolution.title,
+                                                'pokemon_id': current_pokemon.evolution.id,
+                                                'img_url': f"{request.build_absolute_uri('/media/')}{current_pokemon.evolution.photo}"}
 
+    if current_pokemon.relative.first() is None:
+        requested_pokemon['next_evolution'] = { 'title_ru': "Нет потомков",
+                                                    'pokemon_id': 0,
+                                                    'img_url': ''}
+    else:
+        requested_pokemon['next_evolution'] = { 'title_ru': current_pokemon.relative.first().title,
+                                                    'pokemon_id': current_pokemon.relative.first().id,
+                                                    'img_url': f"{request.build_absolute_uri('/media/')}{current_pokemon.relative.first().photo}"}
 
-        # if current_pokemon.next_evolution is None:
-        #     requested_pokemon['next_evolution'] = { 'title_ru': "Нет потомка",
-        #                                             'pokemon_id': 0,
-        #                                             'img_url': ''}
-        #     requested_pokemon['previous_evolution'] = { 'title_ru': f"",
-        #                                                 'pokemon_id': 0,
-        #                                                 'img_url': ''}
-
-        # else:
-        #     requested_pokemon['next_evolution'] = {'title_ru': f"{current_pokemon.next_evolution.title}",
-        #                                            'pokemon_id': current_pokemon.next_evolution.id,
-        #                                            'img_url': ''}
-
-        # if current_pokemon.previous_evolution is None:
-        #     requested_pokemon['previous_evolution'] = { 'title_ru': "Нет предка",
-        #                                                 'pokemon_id': 0,
-        #                                                 'img_url': ''}
-        #     requested_pokemon['next_evolution'] = {'title_ru': f"{current_pokemon.next_evolution.title}",
-        #                                            'pokemon_id': current_pokemon.next_evolution.id,
-        #                                            'img_url': ''}
-        #
-        # else:
-        #     requested_pokemon['previous_evolution'] = { 'title_ru': f"{current_pokemon.previous_evolution.title}",
-        #                                                 'pokemon_id': current_pokemon.previous_evolution.id,
-        #                                                 'img_url': ''}
-
-    # except Pokemon.DoesNotExist:
-    #     return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_entity in requested_pokemon['entities']:
