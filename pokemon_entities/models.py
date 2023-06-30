@@ -1,13 +1,16 @@
 from django.db import models  # noqa F401
 
+
 class Pokemon(models.Model):
     title = models.CharField(max_length=200, verbose_name='наименование покемона', blank=False)
     title_en = models.CharField(max_length=200, blank=True, verbose_name='наименование покемона на английском')
     title_jp = models.CharField(max_length=200, blank=True, verbose_name='наименование покемона на японском')
     photo = models.ImageField(blank=True, verbose_name='изображение покемона')
-    evolution = models.ForeignKey('self', on_delete=models.CASCADE, related_name='relative', null=True, blank=True)
+    evolution = models.ForeignKey('self', on_delete=models.CASCADE, related_name='next_evolutions', null=True, blank=True, verbose_name='эволюция покемона')
+
     def __str__(self):
         return self.title
+
 
 class PokemonEntity(models.Model):
     lon = models.FloatField(blank=False, verbose_name='долгота')
@@ -21,5 +24,6 @@ class PokemonEntity(models.Model):
     defense = models.IntegerField(help_text="защита", verbose_name='защита покемона')
     stamina = models.IntegerField(help_text="выносливость", verbose_name='выносливость покемона')
     main_pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, verbose_name='покемон', null=True, related_name='entities')
+
     def __str__(self):
         return f'{self.description} {self.lon} {self.lat}'
