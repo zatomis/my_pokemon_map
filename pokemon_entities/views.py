@@ -1,6 +1,4 @@
 import folium
-import json
-from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from .models import PokemonEntity, Pokemon
 from django.utils.timezone import localtime, now
@@ -36,7 +34,7 @@ def show_all_pokemons(request):
             add_pokemon(folium_map, pokemon_db.lat, pokemon_db.lon, f"{request.build_absolute_uri('/media/')}{pokemon_db.main_pokemon.photo}")
             pokemons_on_page.append({
                'pokemon_id': pokemon_db.main_pokemon.id,
-               'img_url': f"{request.build_absolute_uri('/media/')}{pokemon_db.main_pokemon.photo}",
+               'img_url': f"{request.build_absolute_uri(pokemon_db.main_pokemon.photo.url)}",
                'title_ru': pokemon_db.main_pokemon.title,
             })
 
@@ -52,9 +50,9 @@ def show_pokemon(request, pokemon_id):
                          'title': current_pokemon.title,
                          'title_en': current_pokemon.title_en,
                          'title_jp': current_pokemon.title_jp,
-                         'description': '',
-                         'img_url': f"{request.build_absolute_uri('/media/')}{current_pokemon.photo}",
-                         'entities': [{'level': 0, 'lat': 0, 'lon': 0,}],}
+                         'img_url': f"{request.build_absolute_uri(current_pokemon.photo.url)}",
+                         'entities': [{'level': 0, 'lat': 0, 'lon': 0,}],
+                         }
 
     if current_pokemon.evolution is None:
         requested_pokemon['previous_evolution'] = { 'title_ru': "Предок неизвестен",
@@ -63,7 +61,9 @@ def show_pokemon(request, pokemon_id):
     else:
         requested_pokemon['previous_evolution'] = { 'title_ru': current_pokemon.evolution.title,
                                                 'pokemon_id': current_pokemon.evolution.id,
-                                                'img_url': f"{request.build_absolute_uri('/media/')}{current_pokemon.evolution.photo}"}
+                                                'img_url': f"{request.build_absolute_uri(current_pokemon.evolution.photo.url)}"}
+
+
 
     if current_pokemon.relative.first() is None:
         requested_pokemon['next_evolution'] = { 'title_ru': "Нет потомков",
@@ -72,7 +72,7 @@ def show_pokemon(request, pokemon_id):
     else:
         requested_pokemon['next_evolution'] = { 'title_ru': current_pokemon.relative.first().title,
                                                     'pokemon_id': current_pokemon.relative.first().id,
-                                                    'img_url': f"{request.build_absolute_uri('/media/')}{current_pokemon.relative.first().photo}"}
+                                                    'img_url': f"{request.build_absolute_uri(current_pokemon.relative.first().photo.url)}"}
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_entity in requested_pokemon['entities']:
